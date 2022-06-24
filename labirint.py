@@ -2,7 +2,7 @@
 from pygame import *
 window = display.set_mode((700,500))
 display.set_caption("First_Game")
-picture = transform.scale(image.load('white.png'), (700, 500))
+picture = transform.scale(image.load('wallpaper.jpg'), (700, 500))
 class GameSprite(sprite.Sprite):
     def __init__(self,player_image,player_x,player_y,size_x,size_y):
         super().__init__()
@@ -23,22 +23,31 @@ class Player(GameSprite):
         self.rect.x += self.x_speed
         self.rect.y +=self.y_speed
 class Enemy(GameSprite):
+    def __init__(self,player_image,player_x,player_y,size_x,size_y,player_x_speed,player_y_speed):
+        GameSprite.__init__(self,player_image,player_x,player_y,size_x,size_y)
+        
+        self.x_speed = player_x_speed
+        self.y_speed = player_y_speed
     def update(self):
         if self.rect.x <= 470:
-            self.x_speed = 10
-        elif self.rect.x >= 570:
-            self.x_speed = - 10
+            self.rect.x += self.x_speed
+        elif self.rect.x == 620:
+            self.rect.x -= self.x_speed
 
-wall_1 = GameSprite('black.png',300,150,50,350)
-wall_2 = GameSprite('black.png',150,300,150,50)
-wall_3 = GameSprite('black.png',500,300,200,50)
-wall_4 = GameSprite('black.png',0,150,150,50)
-wall_5 = GameSprite('black.png',300,150,250,50)
-enemy = Enemy('finish.png',100,50,80,80,10)
-packman = Player('boar_016.png',180,380,80,80,0,0)
+wall_1 = GameSprite('wall.png',300,150,50,350)
+wall_2 = GameSprite('wall.png',150,300,150,50)
+wall_3 = GameSprite('wall.png',500,300,200,50)
+wall_4 = GameSprite('wall.png',0,150,150,50)
+wall_5 = GameSprite('wall.png',300,150,250,50)
+enemy = Enemy('enemy(1).png',60,60,80,80,10,0)
+packman = Player('hero.png',180,380,50,50,0,0)
+final = GameSprite('pac-7.png',600,400,80,80)
+lose = GameSprite('lose(1).png',0,0,700,500)
+win = GameSprite('win.png',0,0,700,500)
 run = True
 while run:
     for i in event.get():
+
         if i.type == QUIT:
             run = False
         elif i.type == KEYDOWN:
@@ -59,7 +68,19 @@ while run:
                 packman.y_speed = 0
             elif i.key == K_DOWN:
                 packman.y_speed = 0
-  
+    if sprite.collide_rect(packman, enemy) or sprite.collide_rect(packman, wall_1) or sprite.collide_rect(packman, wall_2) or sprite.collide_rect(packman, wall_3) or sprite.collide_rect(packman, wall_4) or sprite.collide_rect(packman, wall_5):
+        lose.reset()
+        display.update()
+        time.delay(2000)      
+        run = False
+        
+    
+    elif sprite.collide_rect(packman, final):
+        win.reset()
+        display.update()
+        time.delay(2000)
+        finish = False
+
     window.blit(picture, (0,0))
     wall_1.reset()
     wall_2.reset()
@@ -70,5 +91,6 @@ while run:
     packman.update()
     enemy.reset()
     enemy.update()
-    time.delay(50)
+    final.reset()
+    time.delay(30)
     display.update()
